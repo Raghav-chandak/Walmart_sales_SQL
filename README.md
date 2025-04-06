@@ -53,11 +53,67 @@ This project is an end-to-end data analysis solution designed to extract critica
 
 ### 9. SQL Analysis: Complex Queries and Business Problem Solving
    - **Business Problem-Solving**: Write and execute complex SQL queries to answer critical business questions, such as:
-     - Revenue trends across branches and categories.
-     - Identifying best-selling product categories.
-     - Sales performance by time, city, and payment method.
-     - Analyzing peak sales periods and customer buying patterns.
-     - Profit margin analysis by branch and category.
+ - Identify the highest-rated category in each branch .
+```sql
+SELECT branch, category, avg_rating
+FROM (
+    SELECT 
+        branch,
+        category,
+        AVG(rating) AS avg_rating,
+        RANK() OVER(PARTITION BY branch ORDER BY AVG(rating) DESC) AS rank
+    FROM walmart
+    GROUP BY branch, category
+) AS ranked
+WHERE rank = 1;
+```
+
+ -  the total quantity of items sold per payment method
+```sql
+SELECT 
+    payment_method,
+    SUM(quantity) AS no_qty_sold
+FROM walmart
+GROUP BY payment_method;
+```
+ - Sales performance by  payment method.
+```sql
+WITH cte AS (
+    SELECT 
+        branch,
+        payment_method,
+        COUNT(*) AS total_trans,
+        RANK() OVER(PARTITION BY branch ORDER BY COUNT(*) DESC) AS rank
+    FROM walmart
+    GROUP BY branch, payment_method
+)
+SELECT branch, payment_method AS preferred_payment_method
+FROM cte
+WHERE rank = 1;
+```
+     
+    
+   - the average, minimum, and maximum rating of categories for each city
+```sql
+SELECT 
+    city,
+    category,
+    MIN(rating) AS min_rating,
+    MAX(rating) AS max_rating,
+    AVG(rating) AS avg_rating
+FROM walmart
+GROUP BY city, category;
+```
+   - Profit margin analysis by category.
+```sql
+SELECT 
+    category,
+    SUM(unit_price * quantity * profit_margin) AS total_profit
+FROM walmart
+GROUP BY category
+ORDER BY total_profit DESC;
+```
+
    - **Documentation**: Keep clear notes of each query's objective, approach, and results.
 
 ### 10. Project Publishing and Documentation
@@ -73,24 +129,11 @@ This project is an end-to-end data analysis solution designed to extract critica
 ## Requirements
 
 - **Python 3.8+**
-- **SQL Databases**: MySQL, PostgreSQL
+- **SQL Databases**: MySQL
 - **Python Libraries**:
-  - `pandas`, `numpy`, `sqlalchemy`, `mysql-connector-python`, `psycopg2`
+  - `pandas`, `numpy`, `sqlalchemy`, `mysql-connector-python`
 - **Kaggle API Key** (for data downloading)
 
-## Getting Started
-
-1. Clone the repository:
-   ```bash
-   git clone <repo-url>
-   ```
-2. Install Python libraries:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Set up your Kaggle API, download the data, and follow the steps to load and analyze.
-
----
 
 ## Project Structure
 
@@ -106,7 +149,7 @@ This project is an end-to-end data analysis solution designed to extract critica
 
 ## Results and Insights
 
-This section will include your analysis findings:
+ analysis findings:
 - **Sales Insights**: Key categories, branches with highest sales, and preferred payment methods.
 - **Profitability**: Insights into the most profitable product categories and locations.
 - **Customer Behavior**: Trends in ratings, payment preferences, and peak shopping hours.
@@ -120,11 +163,6 @@ Possible extensions to this project:
 
 ---
 
-## License
-
-This project is licensed under the MIT License. 
-
----
 
 ## Acknowledgments
 
