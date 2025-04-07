@@ -7,6 +7,14 @@ This project is an end-to-end data analysis solution designed to extract critica
 
 ---
 
+## Requirements
+
+- **Python 3.8+**
+- **SQL Databases**: MySQL
+- **Python Libraries**:
+  - `pandas`, `numpy`, `sqlalchemy`, `mysql-connector-python`
+- **Kaggle API Key** (for data downloading)
+
 ## Project Steps
 
 ### 1. Set Up the Environment
@@ -51,88 +59,6 @@ This project is an end-to-end data analysis solution designed to extract critica
    - **Table Creation**: Set up tables in both MySQL  using Python SQLAlchemy to automate table creation and data insertion.
    - **Verification**: Run initial SQL queries to confirm that the data has been loaded accurately.
 
-### 9. SQL Analysis: Complex Queries and Business Problem Solving
-   - **Business Problem-Solving**: Write and execute complex SQL queries to answer critical business questions, such as:
- - Identify the highest-rated category in each branch .
-```sql
-SELECT branch, category, avg_rating
-FROM (
-    SELECT 
-        branch,
-        category,
-        AVG(rating) AS avg_rating,
-        RANK() OVER(PARTITION BY branch ORDER BY AVG(rating) DESC) AS rank
-    FROM walmart
-    GROUP BY branch, category
-) AS ranked
-WHERE rank = 1;
-```
-
- -  the total quantity of items sold per payment method
-```sql
-SELECT 
-    payment_method,
-    SUM(quantity) AS no_qty_sold
-FROM walmart
-GROUP BY payment_method;
-```
- - Sales performance by  payment method.
-```sql
-WITH cte AS (
-    SELECT 
-        branch,
-        payment_method,
-        COUNT(*) AS total_trans,
-        RANK() OVER(PARTITION BY branch ORDER BY COUNT(*) DESC) AS rank
-    FROM walmart
-    GROUP BY branch, payment_method
-)
-SELECT branch, payment_method AS preferred_payment_method
-FROM cte
-WHERE rank = 1;
-```
-     
-    
-   - the average, minimum, and maximum rating of categories for each city
-```sql
-SELECT 
-    city,
-    category,
-    MIN(rating) AS min_rating,
-    MAX(rating) AS max_rating,
-    AVG(rating) AS avg_rating
-FROM walmart
-GROUP BY city, category;
-```
-   - Profit margin analysis by category.
-```sql
-SELECT 
-    category,
-    SUM(unit_price * quantity * profit_margin) AS total_profit
-FROM walmart
-GROUP BY category
-ORDER BY total_profit DESC;
-```
-
-   - **Documentation**: Keep clear notes of each query's objective, approach, and results.
-
-### 10. Project Publishing and Documentation
-   - **Documentation**: Maintain well-structured documentation of the entire process in Markdown or a Jupyter Notebook.
-   - **Project Publishing**: Publish the completed project on GitHub or any other version control platform, including:
-     - The `README.md` file (this document).
-     - Jupyter Notebooks (if applicable).
-     - SQL query scripts.
-     - Data files (if possible) or steps to access them.
-
----
-
-## Requirements
-
-- **Python 3.8+**
-- **SQL Databases**: MySQL
-- **Python Libraries**:
-  - `pandas`, `numpy`, `sqlalchemy`, `mysql-connector-python`
-- **Kaggle API Key** (for data downloading)
 
 
 ## Project Structure
@@ -163,10 +89,3 @@ Possible extensions to this project:
 
 ---
 
-
-## Acknowledgments
-
-- **Data Source**: Kaggle’s Walmart Sales Dataset
-- **Inspiration**: Walmart’s business case studies on sales and supply chain optimization.
-
----
